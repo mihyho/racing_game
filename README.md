@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pixel Racing Sim
 
-## Getting Started
+A dot-pixel-art racing simulation built with Next.js (App Router) + TypeScript.
 
-First, run the development server:
+**Play it live: https://mihyho.github.io/racing_game/**
+
+## Gameplay
+
+- Pick a map (산 / 도시 / 작은마을 / 골목길), then a vehicle, then race.
+- Each map is a random mix of uphill / flat / downhill zones — mountain has
+  the most elevation change, alley the least, flat ground is the same
+  everywhere. The current segment is shown in the top-right corner.
+- Weather (맑음 / 비 / 눈) is rolled at the start of each race and affects
+  speed and how quickly you need to react to events.
+- Random events (rockfall, pedestrians, obstacles, signal changes) pop up
+  during the race — press the hazard-light button in time or you'll crash
+  and stall for a few seconds. Reaction time gets stricter the faster
+  you're going.
+- Alley is narrow: go too fast and you'll clip the surrounding structures.
+- Manual gears (1–6) or AUTO; finishing grades you S/A/B/C based on time.
+
+## Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Note: the app is configured for a GitHub Pages project site, so in dev it's
+served under a `/racing_game` base path — open
+[http://localhost:3000/racing_game](http://localhost:3000/racing_game).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run test    # vitest — pure game-logic tests
+npm run lint
+npm run build   # static export to ./out (see next.config.ts)
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deployment
 
-## Learn More
+Pushing to `main` builds a static export and deploys it to GitHub Pages via
+the workflow in `.github/workflows/deploy.yml`. In the repo settings,
+**Settings → Pages → Build and deployment → Source** must be set to
+**"GitHub Actions"** for this to take effect.
 
-To learn more about Next.js, take a look at the following resources:
+## Project structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/lib/gameLogic.ts` — pure, unit-tested tick function (speed/gear
+  physics, events, hazard/crash minigame, weather/terrain effects)
+- `src/lib/{vehicles,maps,gearTable,terrain,weather}.ts` — game data/config
+- `src/store/useGameStore.ts` — zustand store wiring the pure logic to React
+- `src/components/RaceCanvas.tsx` — Canvas 2D pixel-art race renderer
+- `src/components/screens/*` — map/vehicle select, race, result screens
